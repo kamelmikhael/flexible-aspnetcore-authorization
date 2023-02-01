@@ -1,0 +1,93 @@
+#!csharp
+
+[Flags]
+public enum Permissions
+{
+    None = 0,     // 00000  
+    A    = 1,     // 00001
+    B    = 2,     // 00010
+    C    = 4,     // 00100
+    D    = 8,     // 01000
+    E    = 16,    // 10000
+    All  = ~None  // 11111
+}
+// Permissions are stored using a C# flags enum
+// Applying the attribute indicates the enum can be treated as a bit field, i.e. a set of flags.
+// Note: Values are powers of 2, e.g. 2, 4, 8, 16, ... 
+
+// ~None - The operator ~ produces a complement of its operand by reversing each bit,
+//         So ~00000 = 11111 = A, B, C, D, E 
+
+var userPermissions = Permissions.A | Permissions.C;     // 00001 + 00100 = 00101 = 5
+var requiredPermissions = Permissions.A | Permissions.B; // 00001 + 00010 = 00011 = 3
+
+#!csharp
+
+// Output permissions (as string)
+Console.WriteLine($"User Permissions: {userPermissions}");
+
+#!csharp
+
+Console.WriteLine($"Required Permissions: {requiredPermissions}");
+
+#!csharp
+
+// Output permissions (as int)
+Console.WriteLine($"User Permissions: {(int)userPermissions}");
+Console.WriteLine($"Required Permissions: {(int)requiredPermissions}");
+
+#!csharp
+
+// Check permissions
+Console.WriteLine($"User Permissions: {userPermissions}");
+Console.WriteLine($"Required Permissions: {requiredPermissions}");
+Console.WriteLine($"Authorised: {((requiredPermissions & userPermissions) != 0)}");
+
+#!csharp
+
+// Add permission (with logical OR operator)
+userPermissions |= Permissions.B;
+
+// Output permissions (as string)
+Console.WriteLine($"User Permissions: {userPermissions}");
+
+#!csharp
+
+// Remove permission (with logical XOR operator)
+userPermissions ^= Permissions.B;
+
+// Output permissions (as string)
+Console.WriteLine($"User Permissions: {userPermissions}");
+
+#!csharp
+
+requiredPermissions = Permissions.A | Permissions.B;
+
+// Create a policy name
+// [Authorize(Permissions.A | Permission.B)]
+private const string PolicyPrefix = "Permissions";
+
+var policyName = $"{PolicyPrefix}{(int)requiredPermissions}";
+
+// Output policy name
+Console.WriteLine($"Required Permissions: {requiredPermissions} ({(int)requiredPermissions})");
+Console.WriteLine($"Policy Name: '{policyName}'");
+
+#!csharp
+
+// Update required permissions and policy name
+requiredPermissions = Permissions.A | Permissions.B | Permissions.C;
+
+policyName = $"{PolicyPrefix}{(int)requiredPermissions}";
+
+// Output policy name
+Console.WriteLine($"Required Permissions: {requiredPermissions} ({(int)requiredPermissions})");
+Console.WriteLine($"Policy Name: '{policyName}'");
+
+#!csharp
+
+// Get permissions based on policy name
+var permissionsValue = int.Parse(policyName[PolicyPrefix.Length..]);
+
+Console.WriteLine($"Policy Name: {policyName}");
+Console.WriteLine($"Required Permissions: {(Permissions)permissionsValue}");
